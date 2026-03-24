@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-	#define array_size 8
+	#define array_size 256
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -103,15 +103,15 @@ int main(void)
 
 	HAL_Delay(1000);
 
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(Indicador_GPIO_Port, Indicador_Pin, GPIO_PIN_SET);
 
 	HAL_DMA_Start_IT(&hdma_memtomem_dma1_channel1,(uint32_t)origen,(uint32_t)destino_dma, array_size);
 
 	HAL_Delay(2000);
 
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(Indicador_GPIO_Port, Indicador_Pin, GPIO_PIN_SET);
 	memcpy(destino_cpy, origen, array_size);
-	HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(Indicador_GPIO_Port, Indicador_Pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */

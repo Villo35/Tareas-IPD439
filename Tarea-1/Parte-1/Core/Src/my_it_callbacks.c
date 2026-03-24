@@ -8,5 +8,5 @@
 
 void DmaXferCompleteCallback(DMA_HandleTypeDef *hdma)
 {
-    HAL_GPIO_WritePin(GPIOA, LD2_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(Indicador_GPIO_Port, Indicador_Pin, GPIO_PIN_RESET);
 }
