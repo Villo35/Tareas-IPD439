@@ -18,8 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stdio.h"
-#include "my_it_callbacks.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,7 +48,7 @@ TIM_HandleTypeDef htim3;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-#define NUM_SAMPLES 200
+#define NUM_SAMPLES 80
 
 volatile uint16_t adc_buffer[NUM_SAMPLES];
 volatile uint16_t sample_index = 0;
@@ -119,21 +117,23 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if (data_ready)
-	      {
-	          char msg_buffer;
 
-	          for(int i = 0; i < NUM_SAMPLES; i++)
-	          {
-	              float voltage = ((float)adc_buffer[i] / 4095.0f) * 3.3f;
-
-	              int len = sprintf(msg_buffer, "%.4f\r\n", voltage);
-	              HAL_UART_Transmit(&huart2, (uint8_t*)msg_buffer, len, HAL_MAX_DELAY);
-	          }
-
-	          data_ready = 0;
-	      }
     /* USER CODE BEGIN 3 */
+	  if (data_ready)
+	  {
+
+	      char msg_buffer[16];
+
+	      for (int i = 0; i < NUM_SAMPLES; i++)
+	      {
+	          float voltage = ((float)adc_buffer[i] / 4095.0f) * 3.3f;
+
+	          int len = snprintf(msg_buffer, sizeof(msg_buffer), "%.4f\r\n", voltage);
+
+	          HAL_UART_Transmit(&huart2, (uint8_t*)msg_buffer, len, HAL_MAX_DELAY);
+	      }
+	      data_ready = 0;
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -275,7 +275,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 8000;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 100;
+  htim3.Init.Period = 250;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -287,7 +287,7 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
@@ -370,6 +370,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(Indicador_GPIO_Port, Indicador_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -382,6 +385,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Indicador_Pin */
+  GPIO_InitStruct.Pin = Indicador_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(Indicador_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
